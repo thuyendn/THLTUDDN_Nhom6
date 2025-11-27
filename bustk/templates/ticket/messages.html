@@ -1,0 +1,143 @@
+{% extends "ticket/base.html" %}
+{% load static %}
+
+{% block title %}Tin nhắn - BusTicket{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messages.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="messages-container">
+    <!-- Chat List -->
+    <div class="chat-list">
+        <div class="chat-item active" onclick="selectChat(this)">
+            <div class="chat-avatar">DB</div>
+            <div class="chat-info">
+                <p class="chat-name">DaNaGo Bus</p>
+                <p class="chat-preview">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</p>
+                <p class="chat-time">2:30 PM</p>
+            </div>
+        </div>
+        <div class="chat-item" onclick="selectChat(this)">
+            <div class="chat-avatar">HX</div>
+            <div class="chat-info">
+                <p class="chat-name">Hỗ trợ khách hàng</p>
+                <p class="chat-preview">Chuyến xe của bạn đã được xác nhận</p>
+                <p class="chat-time">10:15 AM</p>
+            </div>
+        </div>
+        <div class="chat-item" onclick="selectChat(this)">
+            <div class="chat-avatar">TC</div>
+            <div class="chat-info">
+                <p class="chat-name">Tài xế</p>
+                <p class="chat-preview">Tôi sẽ đón bạn tại địa điểm trước</p>
+                <p class="chat-time">Hôm qua</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-header-avatar">DB</div>
+                <div class="chat-header-text">
+                    <h5>DaNaGo Bus</h5>
+                    <p>Đang hoạt động</p>
+                </div>
+            </div>
+            <button class="icon-btn">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages" id="messagesContainer">
+    {% for msg in messages %}
+        <div class="message {% if msg.is_from_user %}own{% endif %}" data-message-id="{{ msg.id }}">
+            {% if msg.is_from_user %}
+                <div class="message-content">
+                    <p class="message-text">{{ msg.content }}</p>
+
+                    {% if msg.image %}
+                        <p>
+                            <img src="{{ msg.image.url }}" style="max-width: 180px; border-radius: 6px;">
+                        </p>
+                    {% endif %}
+
+                    <p class="message-time">{{ msg.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                <div class="message-avatar">{{ msg.sender_name|first|upper }}</div>
+
+            {% else %}
+
+                <div class="message-avatar">{{ msg.sender_name|first|upper }}</div>
+
+                <div class="message-content">
+                    <p class="message-text">{{ msg.content }}</p>
+
+                    {% if msg.image %}
+                        <p>
+                            <img src="{{ msg.image.url }}" style="max-width: 180px; border-radius: 6px;">
+                        </p>
+                    {% endif %}
+
+                    <p class="message-time">{{ msg.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="empty-state">Chưa có tin nhắn nào.</div>
+    {% endfor %}
+</div>
+
+
+  <div class="chat-input-area">
+    <form id="messageForm"
+          class="message-form"
+          method="post"
+          enctype="multipart/form-data"
+          style="display:flex;align-items:flex-end;gap:12px;width:100%;">  {# fallback inline #}
+        {% csrf_token %}
+
+        <div class="input-group-custom" style="flex:1;display:flex;align-items:center;gap:10px;">
+            <!-- Nút chọn ảnh -->
+            <label for="id_image" class="icon-btn" id="imageButton">
+                <i class="fas fa-image"></i>
+            </label>
+
+            <!-- File input ẩn -->
+            <input type="file" id="id_image" name="image" accept="image/*" style="display:none;">
+
+            <!-- Ô NHẬP TIN NHẮN: textarea -->
+            <textarea name="content"
+                      class="chat-input"
+                      rows="1"
+                      placeholder="Nhập tin nhắn của bạn..."
+                      style="flex:1;width:100%;padding:10px 14px;border-radius:15px;border:1px solid #ddd;
+                             resize:none;max-height:200px;overflow-y:auto;font-size:15px;"></textarea>
+        </div>
+
+        <!-- Nút Gửi -->
+        <button type="submit" id="sendButton" class="send-btn"
+                style="white-space:nowrap;padding:10px 22px;border-radius:20px;">
+            <i class="fas fa-paper-plane"></i> Gửi
+        </button>
+    </form>
+
+    <!-- Hiển thị lỗi nếu có -->
+    <div id="errorMessage"
+         style="display:none;color:#dc2626;font-size:0.85rem;margin-top:4px;">
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/messages.js' %}"></script>
+{% endblock %}

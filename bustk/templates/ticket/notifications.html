@@ -1,0 +1,135 @@
+{% extends "ticket/base.html" %}
+{% load static %}
+
+{% block title %}Thông báo - DaNaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="notifications-wrapper">
+    <!-- Header -->
+    <div class="notifications-header">
+        <div class="header-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div>
+            <h1>Thông báo</h1>
+            <p style="margin:0; color:#6b7280; font-size:0.9rem;">
+                Bạn có {{ unread_count }} thông báo chưa đọc.
+            </p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-section">
+        <button class="tab-button active"
+                data-target="my-schedule"
+                onclick="switchTab('my-schedule', this)">
+            Lịch trình của tôi
+        </button>
+        <button class="tab-button"
+                data-target="other-notifications"
+                onclick="switchTab('other-notifications', this)">
+            Thông báo khác
+        </button>
+    </div>
+
+    <!-- TAB 1: Lịch trình của tôi -->
+    <div id="my-schedule" class="tab-content active">
+        {% if schedule_notifications %}
+            {% for n in schedule_notifications %}
+                <div class="notification-card {% if n.is_read %}read{% else %}unread{% endif %}">
+                    <div class="notification-icon
+                        {% if n.type == 'BOOKING_SUCCESS' %}trip
+                        {% elif n.type == 'CANCEL_SUCCESS' %}trip
+                        {% elif n.type == 'TRIP_REMINDER' %}schedule
+                        {% elif n.type == 'TRIP_START' %}schedule
+                        {% elif n.type == 'TRIP_COMPLETED' %}schedule
+                        {% else %}system
+                        {% endif %}
+                    ">
+                        {% if n.type == 'BOOKING_SUCCESS' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% elif n.type == 'CANCEL_SUCCESS' %}
+                            <i class="fas fa-times-circle"></i>
+                        {% elif n.type == 'TRIP_REMINDER' %}
+                            <i class="fas fa-clock"></i>
+                        {% elif n.type == 'TRIP_START' %}
+                            <i class="fas fa-bus"></i>
+                        {% elif n.type == 'TRIP_COMPLETED' %}
+                            <i class="fas fa-flag-checkered"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-title">{{ n.title }}</p>
+                        <p class="notification-description">
+                            {{ n.body|linebreaksbr }}
+                        </p>
+                        <div class="notification-footer">
+                            <span class="notification-time">
+                                {{ n.created_at|date:"H:i d/m/Y" }}
+                                {% if n.trip %}
+                                    • {{ n.trip.departure_location }} → {{ n.trip.arrival_location }}
+                                {% endif %}
+                            </span>
+                            {% if not n.is_read %}
+                                <div class="read-indicator"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#9ca3af; font-size:0.9rem;">Chưa có thông báo về lịch trình.</p>
+        {% endif %}
+    </div>
+
+    <!-- TAB 2: Thông báo khác -->
+    <div id="other-notifications" class="tab-content">
+        {% if other_notifications %}
+            {% for n in other_notifications %}
+                <div class="notification-card {% if n.is_read %}read{% else %}unread{% endif %}">
+                    <div class="notification-icon
+                        {% if n.type == 'OTHER' %}system
+                        {% else %}system
+                        {% endif %}
+                    ">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-title">{{ n.title }}</p>
+                        <p class="notification-description">
+                            {{ n.body|linebreaksbr }}
+                        </p>
+                        <div class="notification-footer">
+                            <span class="notification-time">
+                                {{ n.created_at|date:"H:i d/m/Y" }}
+                            </span>
+                            {% if not n.is_read %}
+                                <div class="read-indicator"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#9ca3af; font-size:0.9rem;">Chưa có thông báo khác.</p>
+        {% endif %}
+    </div>
+
+    <!-- Pagination fake (UI thôi, chưa phân trang thật) -->
+    <div class="pagination">
+        <span class="pagination-dot active" onclick="goToPage(1)"></span>
+        <span class="pagination-dot" onclick="goToPage(2)"></span>
+        <span class="pagination-dot" onclick="goToPage(3)"></span>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/notifications.js' %}"></script>
+{% endblock %}

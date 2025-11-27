@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo đánh giá chuyến đi</title>
+
+    <!-- FontAwesome 3.2.1 để render icon sao -->
+    <link rel="stylesheet"
+          href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #e5e7eb;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .btn-open {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* ------------ MODAL ------------ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px 20px;
+            width: 520px;
+            max-width: 90vw;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.4);
+        }
+
+        .modal-header {
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0 0 4px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .modal label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .modal input[type="text"],
+        .modal textarea {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .modal textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal input[type="file"] {
+            margin-top: 4px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            border: none;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ------------ SAO ------------ */
+
+        div.stars {
+            width: 220px;
+            display: inline-block;
+        }
+
+        /* Ẩn radio */
+        input.star {
+            display: none;
+        }
+
+        label.star {
+            float: right;
+            padding: 5px;
+            font-size: 32px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        /* icon sao rỗng mặc định */
+        label.star:before {
+            content: '\f006';
+            font-family: FontAwesome;
+        }
+
+        /* khi radio được chọn → sao đầy */
+        input.star:checked ~ label.star:before {
+            content: '\f005';
+            color: #facc15;
+            text-shadow: 0 0 6px rgba(0,0,0,0.3);
+            transition: all .25s;
+        }
+
+        /* 5 sao được chọn → vàng sáng hơn */
+        input.star-5:checked ~ label.star:before {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(234,179,8,0.6);
+        }
+
+        /* 1 sao → đỏ hơn chút */
+        input.star-1:checked ~ label.star:before {
+            color: #f97316;
+        }
+
+        label.star:hover {
+            transform: rotate(-10deg) scale(1.15);
+        }
+
+        /* clearfix cho .stars */
+        .stars:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+
+<button class="btn-open" id="openBtn">Mở modal đánh giá demo</button>
+
+<div class="modal-overlay" id="review-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Đánh giá chuyến đi</h3>
+        </div>
+
+        <!-- rating -->
+        <label>Điểm đánh giá</label>
+        <div class="stars">
+            <input class="star star-5" id="star-5" type="radio" name="rating" value="5">
+            <label class="star star-5" for="star-5"></label>
+
+            <input class="star star-4" id="star-4" type="radio" name="rating" value="4">
+            <label class="star star-4" for="star-4"></label>
+
+            <input class="star star-3" id="star-3" type="radio" name="rating" value="3">
+            <label class="star star-3" for="star-3"></label>
+
+            <input class="star star-2" id="star-2" type="radio" name="rating" value="2">
+            <label class="star star-2" for="star-2"></label>
+
+            <input class="star star-1" id="star-1" type="radio" name="rating" value="1">
+            <label class="star star-1" for="star-1"></label>
+        </div>
+
+        <!-- title -->
+        <label for="review-title">Tiêu đề</label>
+        <input type="text" id="review-title" placeholder="Ví dụ: Chuyến đi rất thoải mái">
+
+        <!-- content -->
+        <label for="review-content">Nội dung</label>
+        <textarea id="review-content" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+
+        <!-- image -->
+        <label for="review-image">Hình ảnh (tùy chọn)</label>
+        <input type="file" id="review-image">
+
+        <div class="modal-footer">
+            <button class="btn-secondary" id="closeBtn">Hủy</button>
+            <button class="btn-primary" id="submitBtn">Gửi đánh giá</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const openBtn = document.getElementById("openBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const modal = document.getElementById("review-modal");
+    const submitBtn = document.getElementById("submitBtn");
+
+    openBtn.onclick = () => modal.style.display = "flex";
+    closeBtn.onclick = () => modal.style.display = "none";
+
+    submitBtn.onclick = () => {
+        const checked = document.querySelector('input[name="rating"]:checked');
+        const rating = checked ? checked.value : "chưa chọn";
+        alert("Bạn chọn " + rating + " sao");
+    };
+</script>
+
+</body>
+</html>

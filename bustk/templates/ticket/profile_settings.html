@@ -1,0 +1,175 @@
+{% extends "ticket/base.html" %}
+{% load static %}
+
+{% block title %}Thông tin tài khoản - DaNaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile_settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+
+    <div class="profile-header-card">
+        <div class="profile-user-info">
+            <div class="profile-avatar">
+                {% if user.username %}
+                    {{ user.username|first|upper }}
+                {% else %}
+                    U
+                {% endif %}
+            </div>
+            <div>
+                <p class="profile-name">{{ user.username }}</p>
+                <p class="profile-email-main">{{ user.email }}</p>
+            </div>
+        </div>
+
+        <button id="editToggleBtn" class="btn-primary">
+            Chỉnh sửa
+        </button>
+    </div>
+
+    <div id="profileAlert" class="profile-alert" style="display:none;"></div>
+
+    <div class="profile-card">
+        <h3 class="section-title">Thông tin cá nhân</h3>
+
+        <form id="profileForm" class="profile-form" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_profile">
+
+            <div class="form-grid">
+                <!-- Họ và tên -->
+                <div class="form-group">
+                    <label for="fullNameInput">Họ và tên</label>
+                    <input
+                        id="fullNameInput"
+                        name="fullname"
+                        type="text"
+                        class="form-control js-editable"
+                        value="{{ request.user.username }}"
+                        placeholder="Họ và tên"
+                        disabled
+                    >
+                </div>
+
+                <!-- Ngày sinh -->
+                <div class="form-group">
+                    <label for="birthdayInput">Ngày sinh</label>
+                    <input
+                        id="birthdayInput"
+                        name="birthday"
+                        type="date"
+                        class="form-control js-editable"
+                        value="{{ request.user.birthday|date:'Y-m-d' }}"
+                        disabled
+                    >
+                </div>
+
+                <!-- Giới tính -->
+                <div class="form-group">
+                    <label for="genderSelect">Giới tính</label>
+                    <select
+                        id="genderSelect"
+                        name="gender"
+                        class="form-select js-editable"
+                        disabled
+                    >
+                        <option value="">-- Chọn --</option>
+                        <option value="male"   {% if user.gender == "male" %}selected{% endif %}>Nam</option>
+                        <option value="female" {% if user.gender == "female" %}selected{% endif %}>Nữ</option>
+                        <option value="other"  {% if user.gender == "other" %}selected{% endif %}>Khác</option>
+                    </select>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div class="form-group">
+                    <label for="addressInput">Địa chỉ</label>
+                    <input
+                        id="addressInput"
+                        name="address"
+                        type="text"
+                        class="form-control js-editable"
+                        placeholder="Địa chỉ của bạn"
+                        value="{{ user.address }}"
+                        disabled
+                    >
+                </div>
+
+                <!-- Số điện thoại -->
+                <div class="form-group">
+                    <label for="phoneInput">Số điện thoại</label>
+                    <input
+                        id="phoneInput"
+                        name="phone"
+                        type="text"
+                        class="form-control js-editable"
+                        value="{{ user.phone }}"
+                        placeholder="Số điện thoại"
+                        disabled
+                    >
+                </div>
+            </div>
+
+            <div class="security-section">
+                <h4>Bảo mật &amp; mật khẩu</h4>
+
+                <div class="security-grid">
+                    <div class="form-group">
+                        <label for="currentPasswordInput">Mật khẩu hiện tại</label>
+                        <input
+                            id="currentPasswordInput"
+                            type="password"
+                            class="form-control js-editable"
+                            placeholder="(chưa dùng đến)"
+                            disabled
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword1Input">Mật khẩu mới</label>
+                        <input
+                            id="newPassword1Input"
+                            name="password"
+                            type="password"
+                            class="form-control js-editable"
+                            placeholder="Mật khẩu mới"
+                            disabled
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword2Input">Nhập lại mật khẩu mới</label>
+                        <input
+                            id="newPassword2Input"
+                            type="password"
+                            class="form-control js-editable"
+                            placeholder="Nhập lại mật khẩu mới"
+                            disabled
+                        >
+                    </div>
+                </div>
+
+                <p class="security-note">
+                    * Nếu không muốn đổi mật khẩu, hãy để trống ô mật khẩu mới.
+                </p>
+            </div>
+
+            <div class="profile-actions">
+                <button type="submit" id="saveProfileBtn" class="btn-primary" disabled>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const PROFILE_UPDATE_URL = "{% url 'profile_settings' %}";
+</script>
+<script src="{% static 'js/profile_settings.js' %}"></script>
+{% endblock %}
